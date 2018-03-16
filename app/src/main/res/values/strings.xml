@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Let\'s Bake</string>
+    <string name="error">There was an error.</string>
+    <string name="retry">Retry</string>
+    <string name="recipe_error">Error with the recipe!</string>
+    <string name="recipe_image">Image of the recipe</string>
+    <string name="step">Step %d</string>
+</resources>
