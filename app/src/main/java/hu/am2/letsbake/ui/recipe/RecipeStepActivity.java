@@ -15,7 +15,7 @@ import dagger.android.AndroidInjection;
 import hu.am2.letsbake.R;
 import hu.am2.letsbake.Utils;
 
-public class RecipeDetailActivity extends AppCompatActivity {
+public class RecipeStepActivity extends AppCompatActivity {
 
     @Inject
     ViewModelProvider.Factory viewModelProviderFactory;
@@ -26,29 +26,21 @@ public class RecipeDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recipe_detail);
+        setContentView(R.layout.activity_recipe_step);
 
         viewModel = ViewModelProviders.of(this, viewModelProviderFactory).get(RecipeDetailViewModel.class);
 
         Intent intent = getIntent();
 
         int recipeId = intent.getIntExtra(Utils.EXTRA_RECIPE_ID, -1);
+        int step = intent.getIntExtra(Utils.EXTRA_STEP_POSITION, -1);
 
-        if (recipeId != -1) {
-            viewModel.setRecipeId(recipeId);
+        if (recipeId != -1 && step != -1) {
+            viewModel.setRecipeStepAndId(recipeId, step);
         } else {
             Toast.makeText(this, R.string.recipe_error, Toast.LENGTH_SHORT).show();
-            finish();
         }
 
-        viewModel.getRecipeStepNumber().observe(this, this::handleRecipeStep);
-    }
 
-    private void handleRecipeStep(int step) {
-        //TODO handle two pane mode
-        Intent intent = new Intent(this, RecipeStepActivity.class);
-        intent.putExtra(Utils.EXTRA_STEP_POSITION, step);
-        intent.putExtra(Utils.EXTRA_RECIPE_ID, viewModel.getRecipeId());
-        startActivity(intent);
     }
 }

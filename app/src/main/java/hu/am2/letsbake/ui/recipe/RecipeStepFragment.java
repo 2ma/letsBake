@@ -1,9 +1,11 @@
 package hu.am2.letsbake.ui.recipe;
 
 
+import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,12 +36,13 @@ import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
 import hu.am2.letsbake.R;
+import hu.am2.letsbake.data.remote.model.Recipe;
 import hu.am2.letsbake.data.remote.model.RecipeStep;
 import hu.am2.letsbake.databinding.FragmentRecipeStepBinding;
 
 public class RecipeStepFragment extends Fragment {
 
-    public static final String EXTRA_STEP_POSITION = "hu.am2.letsbake.extra.STEP_POSITION";
+
 
     private static final String TAG = "RecipeStepFragment";
 
@@ -52,32 +55,16 @@ public class RecipeStepFragment extends Fragment {
 
     private SimpleExoPlayer exoPlayer;
 
+    private Dialog fullscreenDialog;
+
     private int step;
 
-    public static RecipeStepFragment getInstance(int step) {
-
-        RecipeStepFragment recipeStepFragment = new RecipeStepFragment();
-
-        Bundle bundle = new Bundle();
-
-        bundle.putInt(EXTRA_STEP_POSITION, step);
-
-        recipeStepFragment.setArguments(bundle);
-
-        return recipeStepFragment;
-    }
+    private boolean isFullScreen = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = ViewModelProviders.of(getActivity(), viewModelProviderFactory).get(RecipeDetailViewModel.class);
-
-        Bundle bundle = getArguments();
-
-        step = bundle.getInt(EXTRA_STEP_POSITION);
-
-        viewModel.setStep(step);
-
     }
 
     @Override
@@ -90,27 +77,35 @@ public class RecipeStepFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel.getRecipeStep().observe(this, this::handleRecipeStep);
+        viewModel.getPlayerPosition().observe(this, this::handlePlayerPosition);
     }
 
-    private void changeFabVisibility() {
+    private void handlePlayerPosition(Pair<Integer, Long> playerPos) {
+        if (playerPos != null) {
+            binding.exoPlayer.getPlayer().seekTo(playerPos.first, playerPos.second);
+        }
+    }
+
+    private void changeFabVisibility(Recipe recipe) {
         if (step == 0) {
             binding.prevStepFAB.setVisibility(View.GONE);
         } else {
             binding.prevStepFAB.setVisibility(View.VISIBLE);
         }
-        if (step == viewModel.getMaximumSteps()) {
+        if (step == recipe.getSteps().size() - 1) {
             binding.nextStepFAB.setVisibility(View.GONE);
         } else {
             binding.nextStepFAB.setVisibility(View.VISIBLE);
         }
     }
 
-    private void handleRecipeStep(Pair<Integer, RecipeStep> recipeStep) {
-        binding.recipeStep.setText(recipeStep.second.getShortDescription());
-        initExoPlayer(recipeStep.second.getVideoURL());
-        step = recipeStep.first;
+    private void handleRecipeStep(Pair<Integer, Recipe> recipe) {
+        step = recipe.first;
+        RecipeStep recipeStep = recipe.second.getSteps().get(step);
+        binding.recipeStep.setText(recipeStep.getShortDescription());
+        initExoPlayer(recipeStep.getVideoURL());
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getContext().getString(R.string.step, step + 1));
-        changeFabVisibility();
+        changeFabVisibility(recipe.second);
     }
 
     private void initExoPlayer(String mediaUrl) {
@@ -127,15 +122,21 @@ public class RecipeStepFragment extends Fragment {
             factory.setExtractorsFactory(new DefaultExtractorsFactory());
 
             MediaSource mediaSource = factory.createMediaSource(Uri.parse(mediaUrl));
+
             exoPlayer.prepare(mediaSource);
             exoPlayer.setPlayWhenReady(true);
         }
     }
 
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         viewModel.getRecipe().removeObservers(this);
+        viewModel.getPlayerPosition().removeObservers(this);
+        int windowIndex = binding.exoPlayer.getPlayer().getCurrentWindowIndex();
+        long position = Math.max(0, binding.exoPlayer.getPlayer().getContentPosition());
+        viewModel.setPlayerPosition(windowIndex, position);
         releaseExoPlayer();
     }
 
@@ -159,6 +160,16 @@ public class RecipeStepFragment extends Fragment {
             }
         );
 
+        isFullScreen = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+
+        if (isFullScreen) {
+            ((ViewGroup) binding.exoPlayer.getParent()).removeView(binding.exoPlayer);
+            setupFullScreen();
+            fullscreenDialog.addContentView(binding.exoPlayer, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup
+                .LayoutParams.MATCH_PARENT));
+            fullscreenDialog.show();
+        }
+
         binding.prevStepFAB.setOnClickListener(v -> {
                 releaseExoPlayer();
                 viewModel.prevClick();
@@ -168,8 +179,15 @@ public class RecipeStepFragment extends Fragment {
         ((AppCompatActivity) getActivity()).setSupportActionBar(binding.toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        changeFabVisibility();
-
         return binding.getRoot();
+    }
+
+    private void setupFullScreen() {
+        fullscreenDialog = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+            @Override
+            public void onBackPressed() {
+                getActivity().onBackPressed();
+            }
+        };
     }
 }

@@ -120,7 +120,7 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             stepName.setText(step.getShortDescription());
             GlideApp.with(stepThumbnail)
                 .load(step.getThumbnailURL())
-                .placeholder(R.drawable.recipe_placeholder)
+                .placeholder(R.drawable.cupcake_place_holder)
                 .into(stepThumbnail);
         }
     }

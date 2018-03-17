@@ -10,7 +10,6 @@ import javax.inject.Inject;
 
 import hu.am2.letsbake.data.Repository;
 import hu.am2.letsbake.data.remote.model.Recipe;
-import hu.am2.letsbake.data.remote.model.RecipeStep;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class RecipeDetailViewModel extends ViewModel {
@@ -21,11 +20,13 @@ public class RecipeDetailViewModel extends ViewModel {
 
     //private MutableLiveData<Integer> recipeStep = new MutableLiveData<>();
 
-    private MutableLiveData<Pair<Integer, RecipeStep>> recipeStep = new MutableLiveData<>();
+    private MutableLiveData<Pair<Integer, Recipe>> recipeStep = new MutableLiveData<>();
 
     private MutableLiveData<Integer> recipeStepNumber = new MutableLiveData<>();
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+    private MutableLiveData<Pair<Integer, Long>> playerPosition = new MutableLiveData<>();
 
 
     @Inject
@@ -41,8 +42,16 @@ public class RecipeDetailViewModel extends ViewModel {
         return recipe;
     }
 
-    public LiveData<Pair<Integer, RecipeStep>> getRecipeStep() {
+    public LiveData<Pair<Integer, Recipe>> getRecipeStep() {
         return recipeStep;
+    }
+
+    public LiveData<Pair<Integer, Long>> getPlayerPosition() {
+        return playerPosition;
+    }
+
+    public void setPlayerPosition(int index, long position) {
+        playerPosition.setValue(new Pair<>(index, position));
     }
 
     public void setRecipeStep(int step) {
@@ -53,10 +62,6 @@ public class RecipeDetailViewModel extends ViewModel {
         return recipeStepNumber;
     }
 
-    public int getMaximumSteps() {
-        return recipe.getValue().getSteps().size() - 1;
-    }
-
     @Override
     protected void onCleared() {
         super.onCleared();
@@ -64,25 +69,43 @@ public class RecipeDetailViewModel extends ViewModel {
     }
 
     public void nextClick() {
-        Pair<Integer, RecipeStep> step = recipeStep.getValue();
-        if (step != null && step.first != null && step.first < getMaximumSteps()) {
+        Pair<Integer, Recipe> step = recipeStep.getValue();
+        if (step != null && step.first != null && step.first < step.second.getSteps().size()) {
             int next = step.first + 1;
-            Pair<Integer, RecipeStep> nextStep = new Pair<>(next, recipe.getValue().getSteps().get(next));
+            Pair<Integer, Recipe> nextStep = new Pair<>(next, recipe.getValue());
             recipeStep.setValue(nextStep);
         }
+        playerPosition.setValue(null);
     }
 
     public void prevClick() {
-        Pair<Integer, RecipeStep> step = recipeStep.getValue();
+        Pair<Integer, Recipe> step = recipeStep.getValue();
         if (step != null && step.first != null && step.first > 0) {
             int prev = step.first - 1;
-            Pair<Integer, RecipeStep> prevStep = new Pair<>(prev, recipe.getValue().getSteps().get(prev));
+            Pair<Integer, Recipe> prevStep = new Pair<>(prev, recipe.getValue());
             recipeStep.setValue(prevStep);
         }
+        playerPosition.setValue(null);
     }
 
     public void setStep(int step) {
-        Pair<Integer, RecipeStep> stepPair = new Pair<>(step, recipe.getValue().getSteps().get(step));
-        recipeStep.setValue(stepPair);
+    }
+
+    public void setRecipeStepAndId(int recipeId, int step) {
+
+        Recipe r = recipe.getValue();
+
+        if (r == null || r.getId() != recipeId) {
+            compositeDisposable.add(repository.getRecipeForId(recipeId).subscribe(recipe1 ->
+                {
+                    recipe.postValue(recipe1);
+                    recipeStep.postValue(new Pair<>(step, recipe1));
+                }
+            ));
+        }
+    }
+
+    public int getRecipeId() {
+        return recipe.getValue().getId();
     }
 }

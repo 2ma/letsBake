@@ -69,7 +69,7 @@ public class RecipeBrowserAdapter extends RecyclerView.Adapter<RecipeBrowserAdap
             recipeName.setText(recipe.getName());
             GlideApp.with(recipeImage)
                 .load(recipe.getImage())
-                .placeholder(R.drawable.recipe_placeholder)
+                .placeholder(R.drawable.cupcake_place_holder)
                 .into(recipeImage);
         }
     }

@@ -26,6 +26,10 @@
             android:name=".ui.recipe.RecipeDetailActivity"
             android:parentActivityName=".ui.recipebrowser.RecipeListActivity"
             />
+        <activity
+            android:name=".ui.recipe.RecipeStepActivity"
+            android:parentActivityName=".ui.recipe.RecipeDetailActivity"
+            />
     </application>
 
 </manifest>
