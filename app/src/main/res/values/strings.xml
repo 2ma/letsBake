@@ -5,4 +5,6 @@
     <string name="recipe_error">Error with the recipe!</string>
     <string name="recipe_image">Image of the recipe</string>
     <string name="step">Step %d</string>
+    <string name="error_no_network">There is no connection</string>
+    <string name="video_place_holder">Video place holder image</string>
 </resources>

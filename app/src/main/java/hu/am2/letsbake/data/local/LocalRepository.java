@@ -23,7 +23,6 @@ public class LocalRepository {
     }
 
     public Single<List<Recipe>> getAllRecipes() {
-        Log.d(TAG, "getAllRecipes: localRepo");
         return Single.fromCallable(() -> new ArrayList<>(localCache.values()));
     }
 

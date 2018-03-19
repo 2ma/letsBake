@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -57,8 +58,6 @@ public class RecipeStepFragment extends Fragment {
 
     private Dialog fullscreenDialog;
 
-    private int step;
-
     private boolean isFullScreen = false;
 
     @Override
@@ -86,13 +85,13 @@ public class RecipeStepFragment extends Fragment {
         }
     }
 
-    private void changeFabVisibility(Recipe recipe) {
-        if (step == 0) {
+    private void changeFabVisibility(Pair<Integer, Recipe> recipe) {
+        if (recipe.first == 0) {
             binding.prevStepFAB.setVisibility(View.GONE);
         } else {
             binding.prevStepFAB.setVisibility(View.VISIBLE);
         }
-        if (step == recipe.getSteps().size() - 1) {
+        if (recipe.first == recipe.second.getSteps().size() - 1) {
             binding.nextStepFAB.setVisibility(View.GONE);
         } else {
             binding.nextStepFAB.setVisibility(View.VISIBLE);
@@ -100,17 +99,22 @@ public class RecipeStepFragment extends Fragment {
     }
 
     private void handleRecipeStep(Pair<Integer, Recipe> recipe) {
-        step = recipe.first;
-        RecipeStep recipeStep = recipe.second.getSteps().get(step);
+        RecipeStep recipeStep = recipe.second.getSteps().get(recipe.first);
         binding.recipeStep.setText(recipeStep.getShortDescription());
+        releaseExoPlayer();
+        if (recipeStep.getVideoURL() == null || recipeStep.getVideoURL().isEmpty() && fullscreenDialog != null) {
+            fullscreenDialog.dismiss();
+        }
         initExoPlayer(recipeStep.getVideoURL());
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getContext().getString(R.string.step, step + 1));
-        changeFabVisibility(recipe.second);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getContext().getString(R.string.step, recipe.first + 1));
+        changeFabVisibility(recipe);
     }
 
     private void initExoPlayer(String mediaUrl) {
 
-        if (exoPlayer == null) {
+        if (exoPlayer == null && mediaUrl != null && !mediaUrl.isEmpty()) {
+            binding.exoPlayer.setVisibility(View.VISIBLE);
+            binding.placeHolderImage.setVisibility(View.GONE);
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             RenderersFactory renderersFactory = new DefaultRenderersFactory(getContext());
@@ -125,6 +129,9 @@ public class RecipeStepFragment extends Fragment {
 
             exoPlayer.prepare(mediaSource);
             exoPlayer.setPlayWhenReady(true);
+        } else {
+            binding.exoPlayer.setVisibility(View.GONE);
+            binding.placeHolderImage.setVisibility(View.VISIBLE);
         }
     }
 
@@ -134,9 +141,14 @@ public class RecipeStepFragment extends Fragment {
         super.onDestroyView();
         viewModel.getRecipe().removeObservers(this);
         viewModel.getPlayerPosition().removeObservers(this);
-        int windowIndex = binding.exoPlayer.getPlayer().getCurrentWindowIndex();
-        long position = Math.max(0, binding.exoPlayer.getPlayer().getContentPosition());
-        viewModel.setPlayerPosition(windowIndex, position);
+        if (exoPlayer != null) {
+            int windowIndex = exoPlayer.getCurrentWindowIndex();
+            long position = Math.max(0, exoPlayer.getContentPosition());
+            viewModel.setPlayerPosition(windowIndex, position);
+        }
+        if (fullscreenDialog != null) {
+            fullscreenDialog.dismiss();
+        }
         releaseExoPlayer();
     }
 
@@ -160,24 +172,23 @@ public class RecipeStepFragment extends Fragment {
             }
         );
 
-        isFullScreen = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
-
-        if (isFullScreen) {
-            ((ViewGroup) binding.exoPlayer.getParent()).removeView(binding.exoPlayer);
-            setupFullScreen();
-            fullscreenDialog.addContentView(binding.exoPlayer, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup
-                .LayoutParams.MATCH_PARENT));
-            fullscreenDialog.show();
-        }
-
         binding.prevStepFAB.setOnClickListener(v -> {
                 releaseExoPlayer();
                 viewModel.prevClick();
             }
         );
 
-        ((AppCompatActivity) getActivity()).setSupportActionBar(binding.toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        isFullScreen = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+        binding.exoPlayer.setDefaultArtwork(BitmapFactory.decodeResource(getResources(), R.drawable.cupcake_place_holder));
+
+        //exo player full screen solution based of off: https://github.com/GeoffLedak/ExoplayerFullscreen
+        if (isFullScreen && !viewModel.isTwoPane()) {
+            ((ViewGroup) binding.exoPlayer.getParent()).removeView(binding.exoPlayer);
+            setupFullScreen();
+            fullscreenDialog.addContentView(binding.exoPlayer, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup
+                .LayoutParams.MATCH_PARENT));
+            fullscreenDialog.show();
+        }
 
         return binding.getRoot();
     }
@@ -186,6 +197,7 @@ public class RecipeStepFragment extends Fragment {
         fullscreenDialog = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
             @Override
             public void onBackPressed() {
+                super.onBackPressed();
                 getActivity().onBackPressed();
             }
         };

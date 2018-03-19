@@ -7,7 +7,8 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
@@ -21,14 +22,14 @@ import hu.am2.letsbake.databinding.ActivityRecipeBrowserBinding;
 import hu.am2.letsbake.domain.Result;
 import hu.am2.letsbake.ui.recipe.RecipeDetailActivity;
 
-public class RecipeListActivity extends AppCompatActivity implements RecipeBrowserAdapter.RecipeClickListener {
+public class RecipeBrowserActivity extends AppCompatActivity implements RecipeBrowserAdapter.RecipeClickListener {
 
     @Inject
     ViewModelProvider.Factory viewModelProviderFactory;
 
     private RecipeBrowserViewModel viewModel;
 
-    private static final String TAG = "RecipeListActivity";
+    private static final String TAG = "RecipeBrowserActivity";
 
     private RecipeBrowserAdapter adapter;
 
@@ -44,13 +45,22 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeBrows
 
         viewModel.getRecipes().observe(this, this::handleRecipes);
 
-        binding.recipeList.setLayoutManager(new LinearLayoutManager(this));
+        binding.recipeList.setLayoutManager(new GridLayoutManager(this, numberOfGrid()));
 
         setSupportActionBar(binding.toolbar);
 
         adapter = new RecipeBrowserAdapter(getLayoutInflater(), this);
 
         binding.recipeList.setAdapter(adapter);
+    }
+
+    private int numberOfGrid() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        int minWidth = 600;
+
+        return displayMetrics.widthPixels / minWidth;
     }
 
     private void handleRecipes(Result<Recipe> recipes) {
@@ -67,9 +77,16 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeBrows
             case ERROR: {
                 binding.progressBar.setVisibility(View.GONE);
                 adapter.setRecipes(recipes.data);
-                Snackbar.make(binding.recipeList, R.string.error, Snackbar.LENGTH_SHORT)
-                    .setAction(R.string.retry, v -> viewModel.retry())
-                    .show();
+                if (Utils.isConnected(getApplicationContext())) {
+                    Snackbar.make(binding.recipeList, R.string.error, Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.retry, v -> viewModel.retry())
+                        .show();
+                } else {
+                    Snackbar.make(binding.recipeList, R.string.error_no_network, Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.retry, v -> viewModel.retry())
+                        .show();
+
+                }
                 Log.w(TAG, "handleRecipes: " + recipes.errorMessage);
                 break;
             }

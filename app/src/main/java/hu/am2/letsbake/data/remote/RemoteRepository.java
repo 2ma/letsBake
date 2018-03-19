@@ -1,7 +1,5 @@
 package hu.am2.letsbake.data.remote;
 
-import android.util.Log;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -24,7 +22,6 @@ public class RemoteRepository {
     }
 
     public Single<List<Recipe>> getAllRecipes() {
-        Log.d(TAG, "getAllRecipes: remoteRepo");
         return bakeApiService.getAllRecipes().subscribeOn(Schedulers.io());
     }
 }

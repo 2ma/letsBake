@@ -5,6 +5,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.v4.util.Pair;
+import android.util.Log;
 
 import javax.inject.Inject;
 
@@ -28,10 +29,15 @@ public class RecipeDetailViewModel extends ViewModel {
 
     private MutableLiveData<Pair<Integer, Long>> playerPosition = new MutableLiveData<>();
 
+    private boolean isTwoPane;
+
+    private static final String TAG = "RecipeDetailViewModel";
+
 
     @Inject
     public RecipeDetailViewModel(Repository repository) {
         this.repository = repository;
+        Log.d(TAG, "RecipeDetailViewModel: created");
     }
 
     public void setRecipeId(int id) {
@@ -68,6 +74,14 @@ public class RecipeDetailViewModel extends ViewModel {
         compositeDisposable.clear();
     }
 
+    public boolean isTwoPane() {
+        return isTwoPane;
+    }
+
+    public void setTwoPane(boolean twoPane) {
+        isTwoPane = twoPane;
+    }
+
     public void nextClick() {
         Pair<Integer, Recipe> step = recipeStep.getValue();
         if (step != null && step.first != null && step.first < step.second.getSteps().size()) {
@@ -89,6 +103,10 @@ public class RecipeDetailViewModel extends ViewModel {
     }
 
     public void setStep(int step) {
+        Recipe r = recipe.getValue();
+        if (r != null) {
+            recipeStep.setValue(new Pair<>(step, r));
+        }
     }
 
     public void setRecipeStepAndId(int recipeId, int step) {

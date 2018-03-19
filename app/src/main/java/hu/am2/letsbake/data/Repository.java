@@ -17,6 +17,8 @@ public class Repository {
     private LocalRepository localRepository;
     private RemoteRepository remoteRepository;
 
+    private static final String TAG = "Repository";
+
     @Inject
     public Repository(LocalRepository localRepository, RemoteRepository remoteRepository) {
         this.localRepository = localRepository;
@@ -32,7 +34,7 @@ public class Repository {
                 return localRepository.getAllRecipes();
             });
         }*/
-        return Single.concat(localRepository.getAllRecipes(), getRemoteRecipes()).filter(recipes -> !recipes.isEmpty()).single(Collections
+        return Single.concat(localRepository.getAllRecipes(), getRemoteRecipes()).filter(recipes -> !recipes.isEmpty()).first(Collections
             .emptyList());
     }
 

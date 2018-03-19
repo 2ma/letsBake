@@ -28,6 +28,10 @@ public class RecipeBrowserViewModel extends ViewModel {
     public RecipeBrowserViewModel(Repository repository) {
         Log.d(TAG, "RecipeBrowserViewModel: create");
         this.repository = repository;
+        loadRecipes();
+    }
+
+    private void loadRecipes() {
         recipes.postValue(Result.loading());
         compositeDisposable.add(
             repository.getAllRecipes().subscribe(recipesResponse -> recipes.postValue(Result.success(recipesResponse)),
@@ -47,6 +51,6 @@ public class RecipeBrowserViewModel extends ViewModel {
     }
 
     public void retry() {
-        //TODO retry
+        loadRecipes();
     }
 }

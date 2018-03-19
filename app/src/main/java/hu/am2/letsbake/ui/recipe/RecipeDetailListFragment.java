@@ -69,9 +69,6 @@ public class RecipeDetailListFragment extends Fragment implements RecipeListAdap
         adapter = new RecipeListAdapter(getLayoutInflater(), this);
         binding.recyclerList.setAdapter(adapter);
 
-        ((AppCompatActivity) getActivity()).setSupportActionBar(binding.toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         return binding.getRoot();
     }
 

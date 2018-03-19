@@ -2,6 +2,7 @@
 <manifest package="hu.am2.letsbake"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
@@ -13,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.recipebrowser.RecipeListActivity"
+            android:name=".ui.recipebrowser.RecipeBrowserActivity"
             android:launchMode="singleTop"
             >
             <intent-filter>
@@ -24,7 +25,8 @@
         </activity>
         <activity
             android:name=".ui.recipe.RecipeDetailActivity"
-            android:parentActivityName=".ui.recipebrowser.RecipeListActivity"
+            android:parentActivityName=".ui.recipebrowser.RecipeBrowserActivity"
+            android:launchMode="singleTop"
             />
         <activity
             android:name=".ui.recipe.RecipeStepActivity"
