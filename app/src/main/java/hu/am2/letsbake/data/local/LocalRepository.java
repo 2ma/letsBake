@@ -1,7 +1,5 @@
 package hu.am2.letsbake.data.local;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,14 +7,14 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import hu.am2.letsbake.data.Optional;
 import hu.am2.letsbake.data.remote.model.Recipe;
 import io.reactivex.Single;
 
 @Singleton
 public class LocalRepository {
 
-    private HashMap<Integer, Recipe> localCache = new HashMap<>();
-    private static final String TAG = "LocalRepository";
+    private final HashMap<Integer, Recipe> localCache = new HashMap<>();
 
     @Inject
     public LocalRepository() {
@@ -31,11 +29,16 @@ public class LocalRepository {
             final Recipe recipe = recipes.get(i);
             localCache.put(recipe.getId(), recipe);
         }
-        Log.d(TAG, "addRecipes: localRepo");
     }
 
-    public Single<Recipe> getRecipeForId(int id) {
-        return Single.fromCallable(() -> localCache.get(id));
+    public Single<Optional<Recipe>> getRecipeForId(int id) {
+        return Single.fromCallable(() -> {
+            if (localCache.containsKey(id)) {
+                return new Optional<>(localCache.get(id));
+            } else {
+                return new Optional<>(null);
+            }
+        });
     }
 
 }

@@ -20,8 +20,8 @@ import hu.am2.letsbake.data.remote.model.RecipeStep;
 
 public class RecipeListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private LayoutInflater inflater;
-    private RecipeListClickListener listener;
+    private final LayoutInflater inflater;
+    private final RecipeListClickListener listener;
     private List<RecipeStep> steps = Collections.emptyList();
     private List<RecipeIngredient> ingredients = Collections.emptyList();
 
@@ -46,7 +46,7 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             return new IngredientViewHolder(view);
         } else {
-            View view = inflater.inflate(R.layout.browser_list_item, parent, false);
+            View view = inflater.inflate(R.layout.step_list_item, parent, false);
 
             return new RecipeStepViewHolder(view);
         }
@@ -83,7 +83,9 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     class IngredientViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView ingredientName, quantity, measure;
+        private final TextView ingredientName;
+        private final TextView quantity;
+        private final TextView measure;
 
         public IngredientViewHolder(View itemView) {
             super(itemView);
@@ -101,8 +103,8 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     class RecipeStepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView stepName;
-        private ImageView stepThumbnail;
+        private final TextView stepName;
+        private final ImageView stepThumbnail;
 
         public RecipeStepViewHolder(View itemView) {
             super(itemView);

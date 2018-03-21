@@ -29,7 +29,6 @@ ext {
     buildToolsVersion = '27.0.3'
     supportLibVersion = '27.1.0'
     archLifecycleVersion = '1.1.0'
-    roomVersion = '1.0.0'
     dagger_version = '2.14.1'
     constraintLayoutVersion = '1.1.0-beta5'
     okhttpVersion = '3.10.0'
@@ -41,6 +40,7 @@ ext {
     rxAndroid = '2.0.2'
     rxBinding = '2.1.1'
     exoPlayer = '2.6.1'
+    gson = '2.8.2'
 
     junitVersion = '4.12'
     mockitoVersion = '2.13.0'

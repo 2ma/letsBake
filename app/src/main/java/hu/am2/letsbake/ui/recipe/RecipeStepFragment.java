@@ -36,6 +36,7 @@ import com.google.android.exoplayer2.util.Util;
 import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
+import hu.am2.letsbake.GlideApp;
 import hu.am2.letsbake.R;
 import hu.am2.letsbake.data.remote.model.Recipe;
 import hu.am2.letsbake.data.remote.model.RecipeStep;
@@ -43,9 +44,6 @@ import hu.am2.letsbake.databinding.FragmentRecipeStepBinding;
 
 public class RecipeStepFragment extends Fragment {
 
-
-
-    private static final String TAG = "RecipeStepFragment";
 
     @Inject
     ViewModelProvider.Factory viewModelProviderFactory;
@@ -57,8 +55,6 @@ public class RecipeStepFragment extends Fragment {
     private SimpleExoPlayer exoPlayer;
 
     private Dialog fullscreenDialog;
-
-    private boolean isFullScreen = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -105,12 +101,12 @@ public class RecipeStepFragment extends Fragment {
         if (recipeStep.getVideoURL() == null || recipeStep.getVideoURL().isEmpty() && fullscreenDialog != null) {
             fullscreenDialog.dismiss();
         }
-        initExoPlayer(recipeStep.getVideoURL());
+        initExoPlayer(recipeStep.getVideoURL(), recipeStep.getThumbnailURL());
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getContext().getString(R.string.step, recipe.first + 1));
         changeFabVisibility(recipe);
     }
 
-    private void initExoPlayer(String mediaUrl) {
+    private void initExoPlayer(String mediaUrl, String thumbnailUrl) {
 
         if (exoPlayer == null && mediaUrl != null && !mediaUrl.isEmpty()) {
             binding.exoPlayer.setVisibility(View.VISIBLE);
@@ -132,6 +128,10 @@ public class RecipeStepFragment extends Fragment {
         } else {
             binding.exoPlayer.setVisibility(View.GONE);
             binding.placeHolderImage.setVisibility(View.VISIBLE);
+            GlideApp.with(binding.placeHolderImage)
+                .load(thumbnailUrl)
+                .placeholder(R.drawable.cupcake_place_holder)
+                .into(binding.placeHolderImage);
         }
     }
 
@@ -178,7 +178,7 @@ public class RecipeStepFragment extends Fragment {
             }
         );
 
-        isFullScreen = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+        boolean isFullScreen = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         binding.exoPlayer.setDefaultArtwork(BitmapFactory.decodeResource(getResources(), R.drawable.cupcake_place_holder));
 
         //exo player full screen solution based of off: https://github.com/GeoffLedak/ExoplayerFullscreen

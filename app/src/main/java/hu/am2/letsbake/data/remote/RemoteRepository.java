@@ -13,8 +13,7 @@ import io.reactivex.schedulers.Schedulers;
 @Singleton
 public class RemoteRepository {
 
-    private BakeApiService bakeApiService;
-    private static final String TAG = "RemoteRepository";
+    private final BakeApiService bakeApiService;
 
     @Inject
     public RemoteRepository(BakeApiService bakeApiService) {

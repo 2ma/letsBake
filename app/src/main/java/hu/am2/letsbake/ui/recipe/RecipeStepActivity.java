@@ -22,22 +22,18 @@ public class RecipeStepActivity extends AppCompatActivity {
     @Inject
     ViewModelProvider.Factory viewModelProviderFactory;
 
-    private RecipeDetailViewModel viewModel;
-
-    private ActivityRecipeStepBinding binding;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_recipe_step);
+        ActivityRecipeStepBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_recipe_step);
 
         setSupportActionBar(binding.toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        viewModel = ViewModelProviders.of(this, viewModelProviderFactory).get(RecipeDetailViewModel.class);
+        RecipeDetailViewModel viewModel = ViewModelProviders.of(this, viewModelProviderFactory).get(RecipeDetailViewModel.class);
 
         Intent intent = getIntent();
 

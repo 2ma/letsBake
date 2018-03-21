@@ -15,19 +15,19 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class RecipeDetailViewModel extends ViewModel {
 
-    private Repository repository;
+    private final Repository repository;
 
-    private MutableLiveData<Recipe> recipe = new MutableLiveData<>();
+    private final MutableLiveData<Recipe> recipe = new MutableLiveData<>();
 
     //private MutableLiveData<Integer> recipeStep = new MutableLiveData<>();
 
-    private MutableLiveData<Pair<Integer, Recipe>> recipeStep = new MutableLiveData<>();
+    private final MutableLiveData<Pair<Integer, Recipe>> recipeStep = new MutableLiveData<>();
 
-    private MutableLiveData<Integer> recipeStepNumber = new MutableLiveData<>();
+    private final MutableLiveData<Integer> recipeStepNumber = new MutableLiveData<>();
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    private MutableLiveData<Pair<Integer, Long>> playerPosition = new MutableLiveData<>();
+    private final MutableLiveData<Pair<Integer, Long>> playerPosition = new MutableLiveData<>();
 
     private boolean isTwoPane;
 
@@ -41,7 +41,11 @@ public class RecipeDetailViewModel extends ViewModel {
     }
 
     public void setRecipeId(int id) {
-        compositeDisposable.add(repository.getRecipeForId(id).subscribe(recipe1 -> recipe.postValue(recipe1)));
+        compositeDisposable.add(repository.getRecipeForId(id).subscribe(recipe1 -> {
+            if (!recipe1.isEmpty()) {
+                recipe.postValue(recipe1.get());
+            }
+        }));
     }
 
     public LiveData<Recipe> getRecipe() {
@@ -116,8 +120,10 @@ public class RecipeDetailViewModel extends ViewModel {
         if (r == null || r.getId() != recipeId) {
             compositeDisposable.add(repository.getRecipeForId(recipeId).subscribe(recipe1 ->
                 {
-                    recipe.postValue(recipe1);
-                    recipeStep.postValue(new Pair<>(step, recipe1));
+                    if (!recipe1.isEmpty()) {
+                        recipe.postValue(recipe1.get());
+                        recipeStep.postValue(new Pair<>(step, recipe1.get()));
+                    }
                 }
             ));
         }

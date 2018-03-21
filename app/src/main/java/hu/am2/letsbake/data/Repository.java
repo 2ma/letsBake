@@ -14,10 +14,8 @@ import io.reactivex.Single;
 @Singleton
 public class Repository {
 
-    private LocalRepository localRepository;
-    private RemoteRepository remoteRepository;
-
-    private static final String TAG = "Repository";
+    private final LocalRepository localRepository;
+    private final RemoteRepository remoteRepository;
 
     @Inject
     public Repository(LocalRepository localRepository, RemoteRepository remoteRepository) {
@@ -39,10 +37,16 @@ public class Repository {
     }
 
     private Single<List<Recipe>> getRemoteRecipes() {
-        return remoteRepository.getAllRecipes().doOnSuccess(recipes -> localRepository.addRecipes(recipes));
+        return remoteRepository.getAllRecipes().doOnSuccess(localRepository::addRecipes);
     }
 
-    public Single<Recipe> getRecipeForId(int id) {
-        return localRepository.getRecipeForId(id);
+    private Single<Optional<Recipe>> getRecipeForIdRemote(int id) {
+        return remoteRepository.getAllRecipes().doOnSuccess(localRepository::addRecipes).flattenAsObservable(recipes -> recipes).filter(recipe ->
+            recipe.getId() == id).map(Optional::new).first(new Optional<>(null));
+    }
+
+    public Single<Optional<Recipe>> getRecipeForId(int id) {
+        return Single.concat(localRepository.getRecipeForId(id), getRecipeForIdRemote(id)).filter(recipe -> !recipe.isEmpty()).first(new Optional<>
+            (null));
     }
 }

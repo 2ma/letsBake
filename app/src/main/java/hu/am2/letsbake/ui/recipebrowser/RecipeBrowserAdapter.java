@@ -19,8 +19,8 @@ import hu.am2.letsbake.data.remote.model.Recipe;
 public class RecipeBrowserAdapter extends RecyclerView.Adapter<RecipeBrowserAdapter.RecipeViewHolder> {
 
     private List<Recipe> recipes = Collections.emptyList();
-    private LayoutInflater layoutInflater;
-    private RecipeClickListener listener;
+    private final LayoutInflater layoutInflater;
+    private final RecipeClickListener listener;
 
     public interface RecipeClickListener {
         void recipeClick(Recipe recipe);

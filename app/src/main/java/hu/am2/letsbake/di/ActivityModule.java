@@ -6,6 +6,7 @@ import dagger.android.ContributesAndroidInjector;
 import hu.am2.letsbake.ui.recipe.RecipeDetailActivity;
 import hu.am2.letsbake.ui.recipe.RecipeStepActivity;
 import hu.am2.letsbake.ui.recipebrowser.RecipeBrowserActivity;
+import hu.am2.letsbake.ui.widgetconfiguration.WidgetConfigurationActivity;
 
 @Module
 public abstract class ActivityModule {
@@ -18,4 +19,7 @@ public abstract class ActivityModule {
 
     @ContributesAndroidInjector
     abstract RecipeStepActivity providesRecipeStepActivity();
+
+    @ContributesAndroidInjector
+    abstract WidgetConfigurationActivity providesWidgetConfigurationActivity();
 }

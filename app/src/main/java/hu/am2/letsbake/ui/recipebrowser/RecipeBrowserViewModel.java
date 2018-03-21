@@ -17,11 +17,11 @@ public class RecipeBrowserViewModel extends ViewModel {
 
     private static final String TAG = "RecipeBrowserViewModel";
 
-    private MutableLiveData<Result<Recipe>> recipes = new MutableLiveData<>();
+    private final MutableLiveData<Result<Recipe>> recipes = new MutableLiveData<>();
 
-    private Repository repository;
+    private final Repository repository;
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
 
     @Inject

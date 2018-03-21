@@ -15,7 +15,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:background="@color/colorPrimary"
-            style="@style/ToolbarDarkTitle"
+            android:theme="@style/ToolbarDarkTitle"
             />
 
         <fragment

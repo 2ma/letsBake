@@ -4,9 +4,17 @@
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
                  android:layout_width="match_parent"
                  android:layout_height="match_parent"
-                 android:background="@android:color/white"
         >
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/cupcake"
+            android:adjustViewBounds="true"
+            android:scaleType="center"
+            android:background="@android:color/white"
+            android:contentDescription="@string/cupcake_background"
+            />
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerList"
             android:layout_width="match_parent"

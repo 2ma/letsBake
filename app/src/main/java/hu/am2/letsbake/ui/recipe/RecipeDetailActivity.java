@@ -24,8 +24,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
     private RecipeDetailViewModel viewModel;
 
-    private ActivityRecipeDetailBinding binding;
-
     private boolean isTwoPane;
 
     @Override
@@ -33,7 +31,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_recipe_detail);
+        ActivityRecipeDetailBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_recipe_detail);
 
         viewModel = ViewModelProviders.of(this, viewModelProviderFactory).get(RecipeDetailViewModel.class);
 
@@ -61,7 +59,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
     }
 
     private void handleRecipeStep(int step) {
-        //TODO handle two pane mode
         if (isTwoPane) {
             viewModel.setTwoPane(true);
             viewModel.setStep(step);

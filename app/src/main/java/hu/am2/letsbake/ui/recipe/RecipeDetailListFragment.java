@@ -27,8 +27,6 @@ public class RecipeDetailListFragment extends Fragment implements RecipeListAdap
     ViewModelProvider.Factory viewModelProviderFactory;
     private RecipeDetailViewModel viewModel;
 
-    private FragmentRecipeListBinding binding;
-
     private RecipeListAdapter adapter;
 
     @Override
@@ -63,7 +61,7 @@ public class RecipeDetailListFragment extends Fragment implements RecipeListAdap
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_recipe_list, container, false);
+        FragmentRecipeListBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_recipe_list, container, false);
 
         binding.recyclerList.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new RecipeListAdapter(getLayoutInflater(), this);
