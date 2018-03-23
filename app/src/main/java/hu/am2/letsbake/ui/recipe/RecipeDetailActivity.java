@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import javax.inject.Inject;
@@ -23,8 +22,6 @@ import hu.am2.letsbake.Utils;
 import hu.am2.letsbake.databinding.ActivityRecipeDetailBinding;
 
 public class RecipeDetailActivity extends AppCompatActivity {
-
-    private static final String TAG = "RecipeDetailActivity";
 
     @Inject
     ViewModelProvider.Factory viewModelProviderFactory;
@@ -74,7 +71,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
     }
 
     private void handleRecipeStepActivityTracker(int step) {
-        Log.d(TAG, "handleRecipeStepActivityTracker: " + step);
         if (step != -1) {
             if (isTwoPane) {
                 viewModel.setStep(step);

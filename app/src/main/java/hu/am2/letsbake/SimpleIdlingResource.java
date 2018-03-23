@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Consider using CountingIdlingResource from espresso-contrib package if you use this class from
  * multiple threads or need to keep a count of pending operations.
  */
-
+// This file is from the project: https://github.com/udacity/AdvancedAndroid_TeaTime
 public class SimpleIdlingResource implements IdlingResource {
 
     @Nullable

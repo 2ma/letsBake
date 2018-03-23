@@ -14,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,11 +59,7 @@ public class RecipeStepFragment extends Fragment {
 
     private boolean isFullscreen = false;
 
-    private int initedPlayers = 0;
-
     private boolean isTwoPane = false;
-
-    private static final String TAG = "RecipeStepFragment";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -98,7 +93,6 @@ public class RecipeStepFragment extends Fragment {
     }
 
     private void handleRecipeStep(Pair<Integer, Recipe> recipe) {
-        Log.d(TAG, "handleRecipeStep: ");
         int step = recipe.first;
         RecipeStep recipeStep = recipe.second.getSteps().get(step);
         binding.recipeStepDescription.setText(recipeStep.getDescription());
@@ -122,7 +116,6 @@ public class RecipeStepFragment extends Fragment {
         if (!isTwoPane) {
             changeFabVisibility(recipe);
         }
-        Log.d(TAG, "handleRecipeStep: inited players = " + initedPlayers);
     }
 
     //exo player full screen solution based of off: https://github.com/GeoffLedak/ExoplayerFullscreen
@@ -153,8 +146,6 @@ public class RecipeStepFragment extends Fragment {
 
     private void initExoPlayer() {
 
-        initedPlayers++;
-        Log.d(TAG, "initExoPlayer: ");
         binding.exoPlayer.setVisibility(View.VISIBLE);
         binding.placeHolderImage.setVisibility(View.GONE);
         TrackSelector trackSelector = new DefaultTrackSelector();
@@ -178,7 +169,6 @@ public class RecipeStepFragment extends Fragment {
             initExoPlayer();
         }
         fullScreenMode();
-        Log.d(TAG, "onResume: inited players = " + initedPlayers);
     }
 
     @Override
@@ -193,7 +183,6 @@ public class RecipeStepFragment extends Fragment {
             fullscreenDialog.dismiss();
         }
         releaseExoPlayer();
-        Log.d(TAG, "onPause: initedPlayers = " + initedPlayers);
     }
 
     @Override
@@ -203,10 +192,7 @@ public class RecipeStepFragment extends Fragment {
     }
 
     private void releaseExoPlayer() {
-        Log.d(TAG, "releaseExoPlayer: Called");
         if (exoPlayer != null) {
-            Log.d(TAG, "releaseExoPlayer: Released");
-            initedPlayers--;
             exoPlayer.stop();
             exoPlayer.release();
             exoPlayer = null;

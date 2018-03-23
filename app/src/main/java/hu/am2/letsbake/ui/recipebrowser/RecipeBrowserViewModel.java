@@ -4,7 +4,6 @@ package hu.am2.letsbake.ui.recipebrowser;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
-import android.util.Log;
 
 import java.util.List;
 
@@ -17,7 +16,6 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class RecipeBrowserViewModel extends ViewModel {
 
-    private static final String TAG = "RecipeBrowserViewModel";
 
     private final MutableLiveData<Result<List<Recipe>>> recipes = new MutableLiveData<>();
 
@@ -28,7 +26,6 @@ public class RecipeBrowserViewModel extends ViewModel {
 
     @Inject
     public RecipeBrowserViewModel(Repository repository) {
-        Log.d(TAG, "RecipeBrowserViewModel: create");
         this.repository = repository;
         loadRecipes();
     }

@@ -5,7 +5,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.v4.util.Pair;
-import android.util.Log;
 
 import javax.inject.Inject;
 
@@ -33,13 +32,11 @@ public class RecipeDetailViewModel extends ViewModel {
 
     private Pair<Integer, Long> playerPosition = null;
 
-    private static final String TAG = "RecipeDetailViewModel";
 
 
     @Inject
     public RecipeDetailViewModel(Repository repository) {
         this.repository = repository;
-        Log.d(TAG, "RecipeDetailViewModel: created");
     }
 
     void setRecipeId(int id) {
@@ -106,7 +103,6 @@ public class RecipeDetailViewModel extends ViewModel {
     protected void onCleared() {
         super.onCleared();
         compositeDisposable.clear();
-        Log.d(TAG, "onCleared: RecipeDetailViewModel");
     }
 
     void nextClick() {

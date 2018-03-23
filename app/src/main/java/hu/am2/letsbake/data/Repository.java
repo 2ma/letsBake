@@ -25,14 +25,6 @@ public class Repository {
     }
 
     public Single<List<Recipe>> getAllRecipes() {
-        /*if (localRepository.getAllRecipes().size() != 0) {
-           return Single.fromCallable(() -> localRepository.getAllRecipes());
-        } else {
-            return remoteRepository.getAllRecipes().flatMap(recipes -> {
-                localRepository.addRecipes(recipes);
-                return localRepository.getAllRecipes();
-            });
-        }*/
         return Single.concat(localRepository.getAllRecipes(), getRemoteRecipes()).filter(recipes -> !recipes.isEmpty()).first(Collections
             .emptyList());
     }
