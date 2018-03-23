@@ -12,4 +12,12 @@
     <string name="cupcake_background">Cupcake background image</string>
     <string name="no_recipe">No recipe</string>
     <string name="change_recipe">Change recipe</string>
+    <string name="selected_step">Selected step</string>
+    <string name="welcome_image">Welcome image</string>
+    <string name="welcome_text">Enjoy the recipe!</string>
+    <string name="preparation">Preparation</string>
+    <plurals name="servings">
+        <item quantity="one">%d serving</item>
+        <item quantity="other">%d servings</item>
+    </plurals>
 </resources>

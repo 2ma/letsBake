@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+    >
+
+    <ImageView
+        android:contentDescription="@string/welcome_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/cupcake_place_holder"
+        android:background="@color/colorAccent"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:text="@string/welcome_text"
+        android:layout_gravity="bottom|center_horizontal"
+        android:textColor="@color/yellow"
+        android:layout_marginBottom="16dp"
+        android:shadowColor="@color/colorPrimaryDark"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        />
+
+</FrameLayout>

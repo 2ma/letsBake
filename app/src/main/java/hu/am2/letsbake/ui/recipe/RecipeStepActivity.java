@@ -8,6 +8,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import javax.inject.Inject;
@@ -22,6 +23,8 @@ public class RecipeStepActivity extends AppCompatActivity {
     @Inject
     ViewModelProvider.Factory viewModelProviderFactory;
 
+    private RecipeDetailViewModel viewModel;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         AndroidInjection.inject(this);
@@ -33,7 +36,7 @@ public class RecipeStepActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        RecipeDetailViewModel viewModel = ViewModelProviders.of(this, viewModelProviderFactory).get(RecipeDetailViewModel.class);
+        viewModel = ViewModelProviders.of(this, viewModelProviderFactory).get(RecipeDetailViewModel.class);
 
         Intent intent = getIntent();
 
@@ -45,7 +48,32 @@ public class RecipeStepActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, R.string.recipe_error, Toast.LENGTH_SHORT).show();
         }
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
+        if (item.getItemId() == android.R.id.home) {
+            setupActivityResult();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        setupActivityResult();
+        super.onBackPressed();
+    }
+
+    //send back active recipe step, so the recipe step list can be updated accordingly
+    private void setupActivityResult() {
+        int step = viewModel.getRecipeStepNumber();
+        if (step != -1) {
+            final Intent intent = new Intent();
+            intent.putExtra(Utils.EXTRA_STEP_POSITION, step);
+            setResult(RESULT_OK, intent);
+        } else {
+            setResult(RESULT_CANCELED);
+        }
     }
 }

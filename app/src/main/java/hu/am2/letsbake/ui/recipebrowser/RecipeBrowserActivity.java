@@ -5,17 +5,23 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.Snackbar;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
 import hu.am2.letsbake.R;
+import hu.am2.letsbake.SimpleIdlingResource;
 import hu.am2.letsbake.Utils;
 import hu.am2.letsbake.data.remote.model.Recipe;
 import hu.am2.letsbake.databinding.ActivityRecipeBrowserBinding;
@@ -34,6 +40,7 @@ public class RecipeBrowserActivity extends AppCompatActivity implements RecipeBr
     private RecipeBrowserAdapter adapter;
 
     private ActivityRecipeBrowserBinding binding;
+    private SimpleIdlingResource simpleIdlingResource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +49,10 @@ public class RecipeBrowserActivity extends AppCompatActivity implements RecipeBr
         binding = DataBindingUtil.setContentView(this, R.layout.activity_recipe_browser);
 
         viewModel = ViewModelProviders.of(this, viewModelProviderFactory).get(RecipeBrowserViewModel.class);
+
+        if (simpleIdlingResource != null) {
+            simpleIdlingResource.setIdleState(false);
+        }
 
         viewModel.getRecipes().observe(this, this::handleRecipes);
 
@@ -63,18 +74,24 @@ public class RecipeBrowserActivity extends AppCompatActivity implements RecipeBr
         return displayMetrics.widthPixels / minWidth;
     }
 
-    private void handleRecipes(Result<Recipe> recipes) {
+    private void handleRecipes(Result<List<Recipe>> recipes) {
         switch (recipes.status) {
             case LOADING: {
                 binding.progressBar.setVisibility(View.VISIBLE);
                 break;
             }
             case SUCCESS: {
+                if (simpleIdlingResource != null) {
+                    simpleIdlingResource.setIdleState(true);
+                }
                 binding.progressBar.setVisibility(View.GONE);
                 adapter.setRecipes(recipes.data);
                 break;
             }
             case ERROR: {
+                if (simpleIdlingResource != null) {
+                    simpleIdlingResource.setIdleState(true);
+                }
                 binding.progressBar.setVisibility(View.GONE);
                 adapter.setRecipes(recipes.data);
                 if (Utils.isConnected(getApplicationContext())) {
@@ -98,5 +115,15 @@ public class RecipeBrowserActivity extends AppCompatActivity implements RecipeBr
         Intent intent = new Intent(this, RecipeDetailActivity.class);
         intent.putExtra(Utils.EXTRA_RECIPE_ID, recipe.getId());
         startActivity(intent);
+    }
+
+    @NonNull
+    @VisibleForTesting
+    public IdlingResource getIdlingResource() {
+        if (simpleIdlingResource == null) {
+            simpleIdlingResource = new SimpleIdlingResource();
+        }
+
+        return simpleIdlingResource;
     }
 }

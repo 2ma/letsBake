@@ -49,44 +49,23 @@
             android:layout_height="0dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
             android:textSize="@dimen/recipeStepTextSize"
             android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/barrier"
-            app:layout_constraintBottom_toTopOf="@+id/barrierButtons"
+            app:layout_constraintBottom_toBottomOf="parent"
             tools:text="13. Frost your cake! Use a serrated knife to cut each cooled cake layer in half (so that you have 4 cake layers). Frost in between the layers, the sides of the cake, and the top of the cake. Then eat it!"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/nextStepFAB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recipeStep"
-            app:srcCompat="@drawable/ic_chevron_right_24dp"/>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/prevStepFAB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recipeStep"
-            app:srcCompat="@drawable/ic_chevron_left_24dp"/>
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.4"/>
+            app:layout_constraintGuide_percent="0.7"/>
 
         <android.support.constraint.Barrier
             android:id="@+id/barrier"
@@ -94,14 +73,6 @@
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
             app:constraint_referenced_ids="exoPlayer,placeHolderImage,guideline"
-            />
-
-        <android.support.constraint.Barrier
-            android:id="@+id/barrierButtons"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="top"
-            app:constraint_referenced_ids="nextStepFAB,prevStepFAB"
             />
     </android.support.constraint.ConstraintLayout>
 </layout>

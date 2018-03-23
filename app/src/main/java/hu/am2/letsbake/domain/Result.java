@@ -1,30 +1,33 @@
 package hu.am2.letsbake.domain;
 
 
-import java.util.Collections;
-import java.util.List;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 public class Result<T> {
 
+    @NonNull
     public final ResultStatus status;
-    public final List<T> data;
+    @Nullable
+    public final T data;
+    @Nullable
     public final String errorMessage;
 
-    private Result(ResultStatus status, List<T> data, String errorMessage) {
+    private Result(@NonNull ResultStatus status, @Nullable T data, @Nullable String errorMessage) {
         this.status = status;
         this.data = data;
         this.errorMessage = errorMessage;
     }
 
-    public static <T> Result<T> success(List<T> data) {
+    public static <T> Result<T> success(T data) {
         return new Result<>(ResultStatus.SUCCESS, data, null);
     }
 
     public static <T> Result<T> loading() {
-        return new Result<>(ResultStatus.LOADING, Collections.emptyList(), null);
+        return new Result<>(ResultStatus.LOADING, null, null);
     }
 
     public static <T> Result<T> error(String errorMessage) {
-        return new Result<>(ResultStatus.ERROR, Collections.emptyList(), errorMessage);
+        return new Result<>(ResultStatus.ERROR, null, errorMessage);
     }
 }

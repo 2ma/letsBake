@@ -50,7 +50,7 @@ public class RecipeBrowserAdapter extends RecyclerView.Adapter<RecipeBrowserAdap
 
     class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private final TextView recipeName;
+        private final TextView recipeName, recipeServings;
         private final ImageView recipeImage;
 
         public RecipeViewHolder(View itemView) {
@@ -58,6 +58,7 @@ public class RecipeBrowserAdapter extends RecyclerView.Adapter<RecipeBrowserAdap
             itemView.setOnClickListener(this);
             recipeName = itemView.findViewById(R.id.recipeName);
             recipeImage = itemView.findViewById(R.id.recipeImage);
+            recipeServings = itemView.findViewById(R.id.recipeServings);
         }
 
         @Override
@@ -67,6 +68,8 @@ public class RecipeBrowserAdapter extends RecyclerView.Adapter<RecipeBrowserAdap
 
         void bindRecipe(Recipe recipe) {
             recipeName.setText(recipe.getName());
+            recipeServings.setText(recipeServings.getContext().getResources().getQuantityString(R.plurals.servings, recipe.getServings(), recipe
+                .getServings()));
             GlideApp.with(recipeImage)
                 .load(recipe.getImage())
                 .placeholder(R.drawable.cupcake_place_holder)
@@ -75,7 +78,11 @@ public class RecipeBrowserAdapter extends RecyclerView.Adapter<RecipeBrowserAdap
     }
 
     public void setRecipes(List<Recipe> recipes) {
-        this.recipes = recipes;
+        if (recipes == null) {
+            this.recipes = Collections.emptyList();
+        } else {
+            this.recipes = recipes;
+        }
         notifyDataSetChanged();
     }
 }

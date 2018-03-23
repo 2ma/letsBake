@@ -10,6 +10,7 @@ import hu.am2.letsbake.data.local.LocalRepository;
 import hu.am2.letsbake.data.remote.RemoteRepository;
 import hu.am2.letsbake.data.remote.model.Recipe;
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 
 @Singleton
 public class Repository {
@@ -47,6 +48,6 @@ public class Repository {
 
     public Single<Optional<Recipe>> getRecipeForId(int id) {
         return Single.concat(localRepository.getRecipeForId(id), getRecipeForIdRemote(id)).filter(recipe -> !recipe.isEmpty()).first(new Optional<>
-            (null));
+            (null)).subscribeOn(Schedulers.io());
     }
 }

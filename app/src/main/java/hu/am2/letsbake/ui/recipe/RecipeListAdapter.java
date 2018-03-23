@@ -21,18 +21,28 @@ import hu.am2.letsbake.data.remote.model.RecipeStep;
 public class RecipeListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final LayoutInflater inflater;
-    private final RecipeListClickListener listener;
+    private final RecipeListListener listener;
     private List<RecipeStep> steps = Collections.emptyList();
     private List<RecipeIngredient> ingredients = Collections.emptyList();
 
     private static final int INGREDIENT_TYPE = 0;
     private static final int STEP_TYPE = 1;
 
-    public interface RecipeListClickListener {
-        void onRecipeClick(int step);
+    private int selected = -1;
+
+    void setSelectedRecipeStep(Integer step) {
+        selected = step;
+        notifyDataSetChanged();
+        listener.scrollToPosition(step + ingredients.size());
     }
 
-    public RecipeListAdapter(LayoutInflater inflater, RecipeListClickListener listener) {
+    public interface RecipeListListener {
+        void onRecipeClick(int step);
+
+        void scrollToPosition(int position);
+    }
+
+    RecipeListAdapter(LayoutInflater inflater, RecipeListListener listener) {
         this.inflater = inflater;
         this.listener = listener;
     }
@@ -87,41 +97,54 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         private final TextView quantity;
         private final TextView measure;
 
-        public IngredientViewHolder(View itemView) {
+        IngredientViewHolder(View itemView) {
             super(itemView);
             ingredientName = itemView.findViewById(R.id.ingredient);
             quantity = itemView.findViewById(R.id.quantity);
             measure = itemView.findViewById(R.id.measure);
         }
 
-        public void bindIngredient(RecipeIngredient ingredient) {
+        void bindIngredient(RecipeIngredient ingredient) {
             ingredientName.setText(ingredient.getIngredient());
             quantity.setText(String.valueOf(ingredient.getQuantity()));
             measure.setText(ingredient.getMeasure());
         }
     }
 
-    class RecipeStepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class RecipeStepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private final TextView stepName;
-        private final ImageView stepThumbnail;
+        private final TextView stepName, stepNumber;
+        private final ImageView stepThumbnail, selectedStep;
 
-        public RecipeStepViewHolder(View itemView) {
+        RecipeStepViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             stepName = itemView.findViewById(R.id.recipeName);
             stepThumbnail = itemView.findViewById(R.id.recipeImage);
+            stepNumber = itemView.findViewById(R.id.recipeStep);
+            selectedStep = itemView.findViewById(R.id.selectedStep);
         }
 
         @Override
         public void onClick(View v) {
-            listener.onRecipeClick(getAdapterPosition() - ingredients.size());
+            int step = getAdapterPosition() - ingredients.size();
+            listener.onRecipeClick(step);
+            selected = step;
+            notifyDataSetChanged();
         }
 
-        public void bindStep(RecipeStep step) {
-            stepName.setText(step.getShortDescription());
+        void bindStep(RecipeStep recipeStep) {
+            int step = getAdapterPosition() - ingredients.size();
+            if (step == 0) {
+                stepNumber.setVisibility(View.GONE);
+            } else {
+                stepNumber.setVisibility(View.VISIBLE);
+                stepNumber.setText(stepNumber.getContext().getString(R.string.step, step));
+            }
+            selectedStep.setVisibility(step == selected ? View.VISIBLE : View.GONE);
+            stepName.setText(recipeStep.getShortDescription());
             GlideApp.with(stepThumbnail)
-                .load(step.getThumbnailURL())
+                .load(recipeStep.getThumbnailURL())
                 .placeholder(R.drawable.cupcake_place_holder)
                 .into(stepThumbnail);
         }

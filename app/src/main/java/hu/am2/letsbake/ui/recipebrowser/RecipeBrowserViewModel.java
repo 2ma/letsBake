@@ -6,6 +6,8 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import hu.am2.letsbake.data.Repository;
@@ -17,7 +19,7 @@ public class RecipeBrowserViewModel extends ViewModel {
 
     private static final String TAG = "RecipeBrowserViewModel";
 
-    private final MutableLiveData<Result<Recipe>> recipes = new MutableLiveData<>();
+    private final MutableLiveData<Result<List<Recipe>>> recipes = new MutableLiveData<>();
 
     private final Repository repository;
 
@@ -39,7 +41,7 @@ public class RecipeBrowserViewModel extends ViewModel {
             ));
     }
 
-    public LiveData<Result<Recipe>> getRecipes() {
+    LiveData<Result<List<Recipe>>> getRecipes() {
         return recipes;
     }
 
@@ -50,7 +52,7 @@ public class RecipeBrowserViewModel extends ViewModel {
         compositeDisposable.clear();
     }
 
-    public void retry() {
+    void retry() {
         loadRecipes();
     }
 }

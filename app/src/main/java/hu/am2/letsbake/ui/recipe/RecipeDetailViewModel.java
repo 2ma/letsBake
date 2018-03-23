@@ -11,25 +11,27 @@ import javax.inject.Inject;
 
 import hu.am2.letsbake.data.Repository;
 import hu.am2.letsbake.data.remote.model.Recipe;
+import hu.am2.letsbake.data.remote.model.RecipeStep;
+import hu.am2.letsbake.domain.Result;
+import hu.am2.letsbake.domain.ResultStatus;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class RecipeDetailViewModel extends ViewModel {
 
     private final Repository repository;
 
-    private final MutableLiveData<Recipe> recipe = new MutableLiveData<>();
-
-    //private MutableLiveData<Integer> recipeStep = new MutableLiveData<>();
+    private final MutableLiveData<Result<Recipe>> recipe = new MutableLiveData<>();
 
     private final MutableLiveData<Pair<Integer, Recipe>> recipeStep = new MutableLiveData<>();
 
-    private final MutableLiveData<Integer> recipeStepNumber = new MutableLiveData<>();
+    private final MutableLiveData<Integer> recipeStepActivityTracker = new MutableLiveData<>();
+
+    private final MutableLiveData<Integer> recipeStepDetailListFragmentTracker = new MutableLiveData<>();
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    private final MutableLiveData<Pair<Integer, Long>> playerPosition = new MutableLiveData<>();
-
-    private boolean isTwoPane;
+    private Pair<Integer, Long> playerPosition = null;
 
     private static final String TAG = "RecipeDetailViewModel";
 
@@ -40,96 +42,128 @@ public class RecipeDetailViewModel extends ViewModel {
         Log.d(TAG, "RecipeDetailViewModel: created");
     }
 
-    public void setRecipeId(int id) {
-        compositeDisposable.add(repository.getRecipeForId(id).subscribe(recipe1 -> {
+    void setRecipeId(int id) {
+        recipe.postValue(Result.loading());
+        compositeDisposable.add(repository.getRecipeForId(id).subscribeOn(Schedulers.io()).subscribe(recipe1 -> {
             if (!recipe1.isEmpty()) {
-                recipe.postValue(recipe1.get());
+                recipe.postValue(Result.success(recipe1.get()));
+            } else {
+                recipe.postValue(Result.error("No recipe"));
             }
-        }));
+        }, throwable -> recipe.postValue(Result.error(throwable.getMessage()))));
     }
 
-    public LiveData<Recipe> getRecipe() {
+    LiveData<Integer> getRecipeStepDetailListFragmentTracker() {
+        return recipeStepDetailListFragmentTracker;
+    }
+
+    void setRecipeStepDetailListFragmentTracker(int step) {
+        recipeStepDetailListFragmentTracker.setValue(step);
+    }
+
+    LiveData<Result<Recipe>> getRecipeLiveData() {
         return recipe;
     }
 
-    public LiveData<Pair<Integer, Recipe>> getRecipeStep() {
+    LiveData<Pair<Integer, Recipe>> getRecipeStepLiveData() {
         return recipeStep;
     }
 
-    public LiveData<Pair<Integer, Long>> getPlayerPosition() {
+    Pair<Integer, Long> getPlayerPosition() {
         return playerPosition;
     }
 
-    public void setPlayerPosition(int index, long position) {
-        playerPosition.setValue(new Pair<>(index, position));
+    void setPlayerPosition(int index, long position) {
+        playerPosition = new Pair<>(index, position);
     }
 
-    public void setRecipeStep(int step) {
-        recipeStepNumber.setValue(step);
+    void setRecipeStepActivityTracker(int step) {
+        recipeStepActivityTracker.setValue(step);
     }
 
-    public LiveData<Integer> getRecipeStepNumber() {
-        return recipeStepNumber;
+    LiveData<Integer> getRecipeStepActivityTrackerLiveData() {
+        return recipeStepActivityTracker;
+    }
+
+    public RecipeStep getRecipeStep() {
+        if (recipeStep.getValue() != null) {
+            Pair<Integer, Recipe> stepPair = recipeStep.getValue();
+            return stepPair.second.getSteps().get(stepPair.first);
+        } else {
+            return null;
+        }
+    }
+
+    int getRecipeStepNumber() {
+        if (recipeStep.getValue() != null) {
+            return recipeStep.getValue().first;
+        } else {
+            return -1;
+        }
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
         compositeDisposable.clear();
+        Log.d(TAG, "onCleared: RecipeDetailViewModel");
     }
 
-    public boolean isTwoPane() {
-        return isTwoPane;
-    }
-
-    public void setTwoPane(boolean twoPane) {
-        isTwoPane = twoPane;
-    }
-
-    public void nextClick() {
+    void nextClick() {
         Pair<Integer, Recipe> step = recipeStep.getValue();
-        if (step != null && step.first != null && step.first < step.second.getSteps().size()) {
+        if (step != null && step.first != null && step.first < step.second.getSteps().size()
+            && recipe.getValue() != null && recipe.getValue().status == ResultStatus.SUCCESS) {
             int next = step.first + 1;
-            Pair<Integer, Recipe> nextStep = new Pair<>(next, recipe.getValue());
+            Pair<Integer, Recipe> nextStep = new Pair<>(next, recipe.getValue().data);
             recipeStep.setValue(nextStep);
         }
-        playerPosition.setValue(null);
+        playerPosition = null;
     }
 
-    public void prevClick() {
+    void prevClick() {
         Pair<Integer, Recipe> step = recipeStep.getValue();
-        if (step != null && step.first != null && step.first > 0) {
+        if (step != null && step.first != null && step.first > 0 && recipe.getValue() != null
+            && recipe.getValue().status == ResultStatus.SUCCESS) {
             int prev = step.first - 1;
-            Pair<Integer, Recipe> prevStep = new Pair<>(prev, recipe.getValue());
+            Pair<Integer, Recipe> prevStep = new Pair<>(prev, recipe.getValue().data);
             recipeStep.setValue(prevStep);
         }
-        playerPosition.setValue(null);
+        playerPosition = null;
     }
 
-    public void setStep(int step) {
-        Recipe r = recipe.getValue();
-        if (r != null) {
-            recipeStep.setValue(new Pair<>(step, r));
+    void setStep(int step) {
+        Result<Recipe> r = recipe.getValue();
+        if (r != null && r.status == ResultStatus.SUCCESS) {
+            recipeStep.setValue(new Pair<>(step, r.data));
         }
     }
 
-    public void setRecipeStepAndId(int recipeId, int step) {
+    void setRecipeStepAndId(int recipeId, int step) {
 
-        Recipe r = recipe.getValue();
+        Result<Recipe> r = recipe.getValue();
 
-        if (r == null || r.getId() != recipeId) {
+        if (r == null || r.status == ResultStatus.SUCCESS && r.data.getId() != recipeId) {
+            recipe.postValue(Result.loading());
             compositeDisposable.add(repository.getRecipeForId(recipeId).subscribe(recipe1 ->
                 {
                     if (!recipe1.isEmpty()) {
-                        recipe.postValue(recipe1.get());
+                        recipe.postValue(Result.success(recipe1.get()));
                         recipeStep.postValue(new Pair<>(step, recipe1.get()));
+                    } else {
+                        recipe.postValue(Result.error("No recipe"));
                     }
-                }
+                },
+                throwable -> recipe.postValue(Result.error(throwable.getMessage()))
             ));
         }
     }
 
-    public int getRecipeId() {
-        return recipe.getValue().getId();
+    int getRecipeId() {
+
+        if (recipe.getValue() == null || recipe.getValue().status != ResultStatus.SUCCESS) {
+            return -1;
+        }
+
+        return recipe.getValue().data.getId();
     }
 }

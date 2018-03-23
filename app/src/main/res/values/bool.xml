@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Based off answer from stackoverflow: https://stackoverflow.com/questions/9279111/determine-if-the-device-is-a-smartphone-or-tablet-->
+<resources>
+    <bool name="isTablet">false</bool>
+</resources>

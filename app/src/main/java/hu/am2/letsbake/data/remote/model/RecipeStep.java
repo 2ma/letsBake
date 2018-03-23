@@ -4,6 +4,7 @@ package hu.am2.letsbake.data.remote.model;
 public class RecipeStep {
     private int id;
     private String shortDescription;
+    private String description;
     private String videoURL;
     private String thumbnailURL;
 
@@ -37,5 +38,13 @@ public class RecipeStep {
 
     public void setThumbnailURL(String thumbnailURL) {
         this.thumbnailURL = thumbnailURL;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
