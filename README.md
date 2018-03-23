@@ -3,18 +3,23 @@ Recipe application for Udacity Android course.
 
 This is a student app for the Udacity Google Developer Nanodegree Scholarship Android developer course.
 
-Phone screenshots:
+# Phone screenshots:
 
-![Home screen](screenshots/device-2018-03-23-231550_small.png?raw=true "Home screen")
-![Detail screen](screenshots/device-2018-03-23-231625_small.png?raw=true "Detail screen")
-![Recipe step screen](screenshots/device-2018-03-23-231701_small.png?raw=true "Recipe step screen")
-![Widget](screenshots/device-2018-03-23-231727_small.png?raw=true "Widget")
+<p align="left">
+ <img src="https://github.com/2ma/letsBake/blob/master/screenshots/device-2018-03-23-231550_small.png" height="500"/>
+<img src="https://github.com/2ma/letsBake/blob/master/screenshots/device-2018-03-23-231625_small.png" height="500"/>
+<img src="https://github.com/2ma/letsBake/blob/master/screenshots/device-2018-03-23-231701_small.png" height="500"/>
+<img src="https://github.com/2ma/letsBake/blob/master/screenshots/device-2018-03-23-231727_small.png" height="500"/>
+</p>
 
-Tablet screenshots:
 
-![Home screen](screenshots/Screenshot_2018-03-23-23-18-54_small.png?raw=true "Home screen")
-![Detail screen with step](screenshots/Screenshot_2018-03-23-23-19-07.png?raw=true "Detail screen with step")
-![Detail screen with welcome](screenshots/Screenshot_2018-03-23-23-19-37_small.png?raw=true "Detail screen with welcome")
+# Tablet screenshots:
+
+<p align="left">
+  <img src="https://github.com/2ma/letsBake/blob/master/screenshots/Screenshot_2018-03-23-23-18-54.png" width="700"/>
+  <img src="https://github.com/2ma/letsBake/blob/master/screenshots/Screenshot_2018-03-23-23-19-07.png" width="700"/>
+  <img src="https://github.com/2ma/letsBake/blob/master/screenshots/Screenshot_2018-03-23-23-19-37.png" width="700"/>
+</p>
 
 Copyright (c) 2018 Tamás Müller
 
