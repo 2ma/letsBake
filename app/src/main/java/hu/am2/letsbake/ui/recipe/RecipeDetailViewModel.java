@@ -8,6 +8,7 @@ import android.support.v4.util.Pair;
 
 import javax.inject.Inject;
 
+import hu.am2.letsbake.ExoPlayerState;
 import hu.am2.letsbake.data.Repository;
 import hu.am2.letsbake.data.remote.model.Recipe;
 import hu.am2.letsbake.data.remote.model.RecipeStep;
@@ -30,7 +31,7 @@ public class RecipeDetailViewModel extends ViewModel {
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    private Pair<Integer, Long> playerPosition = null;
+    private ExoPlayerState exoPlayerState = null;
 
 
 
@@ -66,12 +67,12 @@ public class RecipeDetailViewModel extends ViewModel {
         return recipeStep;
     }
 
-    Pair<Integer, Long> getPlayerPosition() {
-        return playerPosition;
+    public ExoPlayerState getExoPlayerState() {
+        return exoPlayerState;
     }
 
-    void setPlayerPosition(int index, long position) {
-        playerPosition = new Pair<>(index, position);
+    public void setExoPlayerState(ExoPlayerState exoPlayerState) {
+        this.exoPlayerState = exoPlayerState;
     }
 
     void setRecipeStepActivityTracker(int step) {
@@ -113,7 +114,7 @@ public class RecipeDetailViewModel extends ViewModel {
             Pair<Integer, Recipe> nextStep = new Pair<>(next, recipe.getValue().data);
             recipeStep.setValue(nextStep);
         }
-        playerPosition = null;
+        exoPlayerState = null;
     }
 
     void prevClick() {
@@ -124,7 +125,7 @@ public class RecipeDetailViewModel extends ViewModel {
             Pair<Integer, Recipe> prevStep = new Pair<>(prev, recipe.getValue().data);
             recipeStep.setValue(prevStep);
         }
-        playerPosition = null;
+        exoPlayerState = null;
     }
 
     void setStep(int step) {

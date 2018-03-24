@@ -35,6 +35,7 @@ import com.google.android.exoplayer2.util.Util;
 import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
+import hu.am2.letsbake.ExoPlayerState;
 import hu.am2.letsbake.GlideApp;
 import hu.am2.letsbake.R;
 import hu.am2.letsbake.data.remote.model.Recipe;
@@ -155,10 +156,13 @@ public class RecipeStepFragment extends Fragment {
         binding.exoPlayer.setPlayer(exoPlayer);
 
         exoPlayer.prepare(videoSource);
-        exoPlayer.setPlayWhenReady(true);
-        Pair<Integer, Long> position = viewModel.getPlayerPosition();
-        if (position != null) {
-            exoPlayer.seekTo(position.first, position.second);
+
+        ExoPlayerState exoPlayerState = viewModel.getExoPlayerState();
+        if (exoPlayerState != null) {
+            exoPlayer.seekTo(exoPlayerState.getWindowIndex(), exoPlayerState.getPosition());
+            exoPlayer.setPlayWhenReady(exoPlayerState.isPlayWhenReady());
+        } else {
+            exoPlayer.setPlayWhenReady(true);
         }
     }
 
@@ -177,7 +181,8 @@ public class RecipeStepFragment extends Fragment {
         if (exoPlayer != null) {
             int windowIndex = exoPlayer.getCurrentWindowIndex();
             long position = Math.max(0, exoPlayer.getContentPosition());
-            viewModel.setPlayerPosition(windowIndex, position);
+            boolean playWhenReady = exoPlayer.getPlayWhenReady();
+            viewModel.setExoPlayerState(new ExoPlayerState(windowIndex, position, playWhenReady));
         }
         if (fullscreenDialog != null) {
             fullscreenDialog.dismiss();
