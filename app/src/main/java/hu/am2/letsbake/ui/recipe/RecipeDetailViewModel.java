@@ -40,11 +40,14 @@ public class RecipeDetailViewModel extends ViewModel {
         this.repository = repository;
     }
 
-    void setRecipeId(int id) {
+    void setRecipeId(int id, int step) {
         recipe.postValue(Result.loading());
         compositeDisposable.add(repository.getRecipeForId(id).subscribeOn(Schedulers.io()).subscribe(recipe1 -> {
             if (!recipe1.isEmpty()) {
                 recipe.postValue(Result.success(recipe1.get()));
+                if (step != -1) {
+                    recipeStepActivityTracker.postValue(step);
+                }
             } else {
                 recipe.postValue(Result.error("No recipe"));
             }
@@ -67,11 +70,11 @@ public class RecipeDetailViewModel extends ViewModel {
         return recipeStep;
     }
 
-    public ExoPlayerState getExoPlayerState() {
+    ExoPlayerState getExoPlayerState() {
         return exoPlayerState;
     }
 
-    public void setExoPlayerState(ExoPlayerState exoPlayerState) {
+    void setExoPlayerState(ExoPlayerState exoPlayerState) {
         this.exoPlayerState = exoPlayerState;
     }
 

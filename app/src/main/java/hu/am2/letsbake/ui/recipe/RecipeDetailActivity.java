@@ -55,13 +55,17 @@ public class RecipeDetailActivity extends AppCompatActivity {
         }
 
         int recipeId = intent.getIntExtra(Utils.EXTRA_RECIPE_ID, -1);
+        int step = -1;
 
-        if (recipeId == -1 && savedInstanceState != null) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(Utils.EXTRA_RECIPE_ID)) {
             recipeId = savedInstanceState.getInt(Utils.EXTRA_RECIPE_ID);
+            if (savedInstanceState.containsKey(Utils.EXTRA_STEP_POSITION)) {
+                step = savedInstanceState.getInt(Utils.EXTRA_STEP_POSITION);
+            }
         }
 
         if (recipeId != -1) {
-            viewModel.setRecipeId(recipeId);
+            viewModel.setRecipeId(recipeId, step);
         } else {
             Toast.makeText(this, R.string.recipe_error, Toast.LENGTH_SHORT).show();
             finish();
@@ -99,9 +103,13 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        int rId = viewModel.getRecipeId();
-        if (rId != -1) {
+        int recipeId = viewModel.getRecipeId();
+        if (recipeId != -1) {
             outState.putInt(Utils.EXTRA_RECIPE_ID, viewModel.getRecipeId());
+            int step = viewModel.getRecipeStepNumber();
+            if (step != -1) {
+                outState.putInt(Utils.EXTRA_STEP_POSITION, viewModel.getRecipeStepNumber());
+            }
         }
         super.onSaveInstanceState(outState);
     }

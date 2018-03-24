@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -44,7 +45,7 @@ import hu.am2.letsbake.databinding.FragmentRecipeStepBinding;
 
 public class RecipeStepFragment extends Fragment {
 
-
+    private static final String EXTRA_EXOPLAYER_STATE = "hu.am2.letsbake.extra.EXOPLAYER_STATE";
     @Inject
     ViewModelProvider.Factory viewModelProviderFactory;
 
@@ -66,6 +67,9 @@ public class RecipeStepFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = ViewModelProviders.of(getActivity(), viewModelProviderFactory).get(RecipeDetailViewModel.class);
+        if (savedInstanceState != null && savedInstanceState.containsKey(EXTRA_EXOPLAYER_STATE)) {
+            viewModel.setExoPlayerState(savedInstanceState.getParcelable(EXTRA_EXOPLAYER_STATE));
+        }
     }
 
     @Override
@@ -167,8 +171,14 @@ public class RecipeStepFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            startExoPlayer();
+        }
+    }
+
+    private void startExoPlayer() {
         if (videoSource != null && exoPlayer == null) {
             initExoPlayer();
         }
@@ -176,8 +186,22 @@ public class RecipeStepFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            startExoPlayer();
+        }
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            stopExoPlayer();
+        }
+    }
+
+    private void stopExoPlayer() {
         if (exoPlayer != null) {
             int windowIndex = exoPlayer.getCurrentWindowIndex();
             long position = Math.max(0, exoPlayer.getContentPosition());
@@ -188,6 +212,29 @@ public class RecipeStepFragment extends Fragment {
             fullscreenDialog.dismiss();
         }
         releaseExoPlayer();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            stopExoPlayer();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        //have to check both because after api24 onSaveInstanceState is called before stop, so the viewModel won't have state
+        //before api24 exoPlayer would be null, because it was already released in onPause
+        if (viewModel.getExoPlayerState() != null) {
+            outState.putParcelable(EXTRA_EXOPLAYER_STATE, viewModel.getExoPlayerState());
+        } else if (exoPlayer != null) {
+            int windowIndex = exoPlayer.getCurrentWindowIndex();
+            long position = Math.max(0, exoPlayer.getContentPosition());
+            boolean playWhenReady = exoPlayer.getPlayWhenReady();
+            outState.putParcelable(EXTRA_EXOPLAYER_STATE, new ExoPlayerState(windowIndex, position, playWhenReady));
+        }
+        super.onSaveInstanceState(outState);
     }
 
     @Override
