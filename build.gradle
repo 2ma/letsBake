@@ -30,7 +30,7 @@ ext {
     supportLibVersion = '27.1.0'
     archLifecycleVersion = '1.1.1'
     dagger_version = '2.14.1'
-    constraintLayoutVersion = '1.1.0-beta5'
+    constraintLayoutVersion = '1.0.2'
     okhttpVersion = '3.10.0'
     okioVersion = '1.13.0'
     retrofitVersion = '2.3.0'

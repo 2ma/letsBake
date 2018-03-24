@@ -55,7 +55,7 @@
             android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/barrier"
+            app:layout_constraintTop_toBottomOf="@+id/guideline"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:text="13. Frost your cake! Use a serrated knife to cut each cooled cake layer in half (so that you have 4 cake layers). Frost in between the layers, the sides of the cake, and the top of the cake. Then eat it!"/>
 
@@ -67,12 +67,5 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.7"/>
 
-        <android.support.constraint.Barrier
-            android:id="@+id/barrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="exoPlayer,placeHolderImage,guideline"
-            />
     </android.support.constraint.ConstraintLayout>
 </layout>
