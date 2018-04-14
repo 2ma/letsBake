@@ -30,12 +30,12 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
+import hu.am2.letsbake.CacheDataSourceFactory;
 import hu.am2.letsbake.ExoPlayerState;
 import hu.am2.letsbake.GlideApp;
 import hu.am2.letsbake.R;
@@ -48,6 +48,9 @@ public class RecipeStepFragment extends Fragment {
     private static final String EXTRA_EXOPLAYER_STATE = "hu.am2.letsbake.extra.EXOPLAYER_STATE";
     @Inject
     ViewModelProvider.Factory viewModelProviderFactory;
+
+    @Inject
+    CacheDataSourceFactory cacheDataSource;
 
     private RecipeDetailViewModel viewModel;
 
@@ -144,7 +147,7 @@ public class RecipeStepFragment extends Fragment {
 
     private void prepareVideoSource(String videoUrl) {
         String userAgent = Util.getUserAgent(getContext(), "LetsBake");
-        ExtractorMediaSource.Factory factory = new ExtractorMediaSource.Factory(new DefaultDataSourceFactory(getContext(), userAgent));
+        ExtractorMediaSource.Factory factory = new ExtractorMediaSource.Factory(cacheDataSource);
         factory.setExtractorsFactory(new DefaultExtractorsFactory());
         videoSource = factory.createMediaSource(Uri.parse(videoUrl));
     }
